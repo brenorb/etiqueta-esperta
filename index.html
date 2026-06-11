@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Etiqueta Esperta</title>
+    <meta
+      name="description"
+      content="Compare preco por unidade, metro, grama ou litro e descubra qual produto rende mais."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">compras com menos chute</p>
+          <h1>Etiqueta Esperta</h1>
+          <p class="hero-text">
+            Compare preco por medida real e pare de adivinhar se o pacote maior
+            compensa. Papel higienico, cafe, arroz, sabao, qualquer coisa. Fica
+            salvo neste navegador para voce consultar de novo no celular.
+          </p>
+          <div class="preset-row" aria-label="Atalhos de categorias">
+            <button class="preset-button" data-preset="toilet-paper" type="button">
+              papel higienico
+            </button>
+            <button class="preset-button" data-preset="paper-towel" type="button">
+              papel toalha
+            </button>
+            <button class="preset-button" data-preset="coffee" type="button">
+              cafe
+            </button>
+            <button class="preset-button" data-preset="liquid" type="button">
+              liquidos
+            </button>
+          </div>
+        </div>
+        <aside class="hero-panel">
+          <p class="panel-kicker">o que importa</p>
+          <div id="liveSummary" class="live-summary">
+            <p class="summary-title">preencha os campos</p>
+            <p class="summary-highlight">R$ 0,00 por medida</p>
+            <p class="summary-detail">O resultado aparece aqui antes de entrar na lista.</p>
+          </div>
+        </aside>
+      </header>
+
+      <main class="layout">
+        <section class="form-card">
+          <div class="section-heading">
+            <p class="section-kicker">nova comparacao</p>
+            <h2>Coloque o preco da etiqueta</h2>
+          </div>
+
+          <form id="calculatorForm" class="calculator-form">
+            <label>
+              <span>Nome do produto</span>
+              <input
+                id="productName"
+                name="productName"
+                type="text"
+                maxlength="60"
+                placeholder="Ex.: Papel higiênico folha dupla"
+                required
+              />
+            </label>
+
+            <div class="field-grid">
+              <label>
+                <span>Preco total</span>
+                <input id="price" name="price" type="number" min="0.01" step="0.01" required />
+              </label>
+
+              <label>
+                <span>Moeda</span>
+                <select id="currency" name="currency">
+                  <option value="BRL">BRL</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Numero de unidades</span>
+                <input
+                  id="unitCount"
+                  name="unitCount"
+                  type="number"
+                  min="1"
+                  step="1"
+                  required
+                />
+              </label>
+
+              <label>
+                <span>Quantidade por unidade</span>
+                <input
+                  id="amountPerUnit"
+                  name="amountPerUnit"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  required
+                />
+              </label>
+
+              <label>
+                <span>Unidade da medida</span>
+                <input
+                  id="measureLabel"
+                  name="measureLabel"
+                  type="text"
+                  maxlength="12"
+                  placeholder="m, g, ml, un..."
+                  required
+                />
+              </label>
+
+              <label>
+                <span>Base de comparacao</span>
+                <input
+                  id="comparisonBase"
+                  name="comparisonBase"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value="1"
+                  required
+                />
+              </label>
+
+              <label>
+                <span>Data da compra</span>
+                <input id="purchaseDate" name="purchaseDate" type="date" />
+              </label>
+
+              <label class="field-span">
+                <span>Loja ou anotacao</span>
+                <input
+                  id="storeNote"
+                  name="storeNote"
+                  type="text"
+                  maxlength="60"
+                  placeholder="Ex.: mercado do bairro, promocao, marca boa..."
+                />
+              </label>
+            </div>
+
+            <p class="helper-text">
+              Use a base para ver algo mais util: `10 m` para papel higienico,
+              `100 g` para cafe, `1 l` para liquidos. A comparacao atual e o
+              historico ficam salvos localmente neste aparelho.
+            </p>
+
+            <div class="form-actions">
+              <button class="primary-button" type="submit">Adicionar a comparacao</button>
+              <button id="resetFormButton" class="secondary-button" type="button">
+                Limpar formulario
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-card">
+          <div class="results-header">
+            <div class="section-heading">
+              <p class="section-kicker">resultado</p>
+              <h2>Sua prateleira comparavel</h2>
+            </div>
+            <div class="results-actions">
+              <button id="loadDemoButton" class="secondary-button" type="button">Carregar exemplo</button>
+              <button id="clearItemsButton" class="secondary-button danger" type="button">
+                Apagar lista
+              </button>
+            </div>
+          </div>
+
+          <div id="leaderboard" class="leaderboard empty-state">
+            Adicione pelo menos um item para comecar.
+          </div>
+
+          <div id="resultsList" class="results-list" aria-live="polite"></div>
+
+          <section class="history-section">
+            <div class="history-header">
+              <div class="section-heading">
+                <p class="section-kicker">historico local</p>
+                <h2>Ultimos registros</h2>
+              </div>
+              <button id="clearHistoryButton" class="secondary-button danger" type="button">
+                Apagar historico
+              </button>
+            </div>
+
+            <div id="historyList" class="history-list empty-state">
+              Ainda nao existe historico salvo neste navegador.
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <template id="itemCardTemplate">
+      <article class="item-card">
+        <div class="item-card-top">
+          <div>
+            <p class="item-rank"></p>
+            <h3 class="item-name"></h3>
+          </div>
+          <button class="icon-button" type="button" aria-label="Remover item">remover</button>
+        </div>
+        <p class="item-price-base"></p>
+        <dl class="metric-grid">
+          <div>
+            <dt>Total medido</dt>
+            <dd class="item-total-measure"></dd>
+          </div>
+          <div>
+            <dt>Preco por unidade</dt>
+            <dd class="item-price-unit"></dd>
+          </div>
+          <div>
+            <dt>Preco por medida</dt>
+            <dd class="item-price-measure"></dd>
+          </div>
+          <div>
+            <dt>Diferenca do lider</dt>
+            <dd class="item-vs-leader"></dd>
+          </div>
+        </dl>
+      </article>
+    </template>
+
+    <template id="historyItemTemplate">
+      <article class="history-item">
+        <div class="history-item-top">
+          <div>
+            <p class="item-rank">registro salvo</p>
+            <h3 class="history-name"></h3>
+          </div>
+          <div class="history-buttons">
+            <button class="secondary-button history-use-button" type="button">usar de novo</button>
+            <button class="icon-button history-remove-button" type="button" aria-label="Remover registro">
+              remover
+            </button>
+          </div>
+        </div>
+        <p class="history-price"></p>
+        <p class="history-meta"></p>
+      </article>
+    </template>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
