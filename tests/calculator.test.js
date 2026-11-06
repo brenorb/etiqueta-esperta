@@ -67,3 +67,33 @@ test("calculateProduct rejects invalid values", () => {
     /Nome do produto/
   );
 });
+
+test("rankProducts compares only matching currencies and measures", () => {
+  const product = (id, price, currency, measureLabel, comparisonBase = 1) => calculateProduct({
+    id,
+    name: id,
+    price,
+    unitCount: 1,
+    amountPerUnit: 100,
+    currency,
+    measureLabel,
+    comparisonBase
+  });
+
+  const ranked = rankProducts([
+    product("paper", 20, "BRL", "m"),
+    product("coffee", 4, "BRL", "g"),
+    product("dollar-paper", 10, "USD", "m"),
+    product("paper-alt", 30, "BRL", "m", 10)
+  ]);
+
+  assert.deepEqual(ranked.map(({ id, rank, isLeader }) => [id, rank, isLeader]), [
+    ["paper", 1, true],
+    ["paper-alt", 2, false],
+    ["coffee", 1, true],
+    ["dollar-paper", 1, true]
+  ]);
+  assert.equal(Math.round(ranked[1].deltaPercentFromLeader), 50);
+  assert.equal(ranked[2].deltaPercentFromLeader, 0);
+  assert.equal(ranked[3].deltaPercentFromLeader, 0);
+});
