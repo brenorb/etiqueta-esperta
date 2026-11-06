@@ -42,20 +42,28 @@ export function calculateProduct(input) {
 export function rankProducts(products) {
   if (!Array.isArray(products)) return [];
 
-  const sorted = [...products].sort((a, b) => a.pricePerMeasure - b.pricePerMeasure);
-  const leader = sorted[0];
+  const groups = new Map();
+  for (const product of products) {
+    const key = JSON.stringify([product.currency, product.measureLabel]);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(product);
+  }
 
-  return sorted.map((product, index) => {
-    const delta = leader ? product.pricePerMeasure - leader.pricePerMeasure : 0;
-    const deltaPercent = leader && leader.pricePerMeasure > 0 ? (delta / leader.pricePerMeasure) * 100 : 0;
+  return [...groups.values()].flatMap((group) => {
+    group.sort((a, b) => a.pricePerMeasure - b.pricePerMeasure);
+    const leader = group[0];
+    return group.map((product, index) => {
+      const delta = product.pricePerMeasure - leader.pricePerMeasure;
+      const deltaPercent = leader.pricePerMeasure > 0 ? (delta / leader.pricePerMeasure) * 100 : 0;
 
-    return {
-      ...product,
-      rank: index + 1,
-      isLeader: index === 0,
-      deltaFromLeader: delta,
-      deltaPercentFromLeader: deltaPercent
-    };
+      return {
+        ...product,
+        rank: index + 1,
+        isLeader: index === 0,
+        deltaFromLeader: delta,
+        deltaPercentFromLeader: deltaPercent
+      };
+    });
   });
 }
 

@@ -210,13 +210,22 @@ function render() {
   }
 
   const leader = ranked[0];
+  const hasSeparateGroups = ranked.some((item, index) => index > 0 && item.isLeader);
   leaderboard.className = "leaderboard";
-  leaderboard.innerHTML = `
-    <p class="leaderboard-kicker">melhor custo por medida</p>
-    <h3>${escapeHtml(leader.name)}</h3>
-    <p class="leaderboard-price">${formatCurrency(leader.pricePerComparisonBase, leader.currency, LOCALE)} por ${formatNumber(leader.comparisonBase, LOCALE)} ${escapeHtml(leader.measureLabel)}</p>
-    <p class="leaderboard-detail">${formatCurrency(leader.price, leader.currency, LOCALE)} por ${formatNumber(leader.unitCount, LOCALE)} unidades de ${formatNumber(leader.amountPerUnit, LOCALE)} ${escapeHtml(leader.measureLabel)}</p>
-  `;
+  if (hasSeparateGroups) {
+    leaderboard.innerHTML = `
+      <p class="leaderboard-kicker">comparações separadas</p>
+      <h3>Cada moeda e medida tem seu próprio grupo</h3>
+      <p class="leaderboard-detail">O ranking e os percentuais usam a referência de cada grupo.</p>
+    `;
+  } else {
+    leaderboard.innerHTML = `
+      <p class="leaderboard-kicker">melhor custo por medida</p>
+      <h3>${escapeHtml(leader.name)}</h3>
+      <p class="leaderboard-price">${formatCurrency(leader.pricePerComparisonBase, leader.currency, LOCALE)} por ${formatNumber(leader.comparisonBase, LOCALE)} ${escapeHtml(leader.measureLabel)}</p>
+      <p class="leaderboard-detail">${formatCurrency(leader.price, leader.currency, LOCALE)} por ${formatNumber(leader.unitCount, LOCALE)} unidades de ${formatNumber(leader.amountPerUnit, LOCALE)} ${escapeHtml(leader.measureLabel)}</p>
+    `;
+  }
 
   resultsList.innerHTML = "";
 
@@ -224,7 +233,7 @@ function render() {
     const node = itemTemplate.content.firstElementChild.cloneNode(true);
     node.classList.toggle("leader", item.isLeader);
     node.querySelector(".item-rank").textContent = item.isLeader
-      ? "melhor compra"
+      ? (hasSeparateGroups ? "melhor do grupo" : "melhor compra")
       : `${item.rank}o lugar`;
     node.querySelector(".item-name").textContent = item.name;
     node.querySelector(".item-price-base").textContent = `${formatCurrency(item.pricePerComparisonBase, item.currency, LOCALE)} por ${formatNumber(item.comparisonBase, LOCALE)} ${item.measureLabel}`;

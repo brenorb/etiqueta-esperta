@@ -2,6 +2,8 @@
 
 Uma pagina estatica para comparar custo por unidade, metro, grama, litro ou qualquer outra medida que voce quiser usar nas compras.
 
+O ranking compara itens com a mesma moeda e a mesma unidade de medida. A base de comparação muda só a apresentação do preço.
+
 Tambem salva historico local no navegador para lembrar quanto voce pagou da ultima vez, sem backend e sem banco de dados.
 
 ## Como usar
