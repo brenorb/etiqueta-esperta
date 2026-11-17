@@ -39,23 +39,42 @@ export function calculateProduct(input) {
   };
 }
 
+/** Products are only comparable when they share a measure and a currency. */
+export function comparisonGroup(product) {
+  return `${String(product.currency || "BRL").toUpperCase()}|${String(product.measureLabel || "").trim().toLowerCase()}`;
+}
+
+/**
+ * Rank products by price per measure within each comparison group. A price
+ * per gram and a price per meter cannot be compared, so each group has its own
+ * leader, and deltas are measured against that leader. Groups keep the order
+ * in which they first appear.
+ */
 export function rankProducts(products) {
   if (!Array.isArray(products)) return [];
 
-  const sorted = [...products].sort((a, b) => a.pricePerMeasure - b.pricePerMeasure);
-  const leader = sorted[0];
+  const groups = new Map();
+  for (const product of products) {
+    const key = comparisonGroup(product);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(product);
+  }
 
-  return sorted.map((product, index) => {
-    const delta = leader ? product.pricePerMeasure - leader.pricePerMeasure : 0;
-    const deltaPercent = leader && leader.pricePerMeasure > 0 ? (delta / leader.pricePerMeasure) * 100 : 0;
-
-    return {
-      ...product,
-      rank: index + 1,
-      isLeader: index === 0,
-      deltaFromLeader: delta,
-      deltaPercentFromLeader: deltaPercent
-    };
+  return [...groups.entries()].flatMap(([group, members]) => {
+    const sorted = [...members].sort((a, b) => a.pricePerMeasure - b.pricePerMeasure);
+    const leader = sorted[0];
+    return sorted.map((product, index) => {
+      const delta = product.pricePerMeasure - leader.pricePerMeasure;
+      const deltaPercent = leader.pricePerMeasure > 0 ? (delta / leader.pricePerMeasure) * 100 : 0;
+      return {
+        ...product,
+        group,
+        rank: index + 1,
+        isLeader: index === 0,
+        deltaFromLeader: delta,
+        deltaPercentFromLeader: deltaPercent
+      };
+    });
   });
 }
 

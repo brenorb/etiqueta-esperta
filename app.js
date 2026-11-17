@@ -1,4 +1,4 @@
-import { calculateProduct, rankProducts, formatCurrency, formatNumber } from "./calculator.js";
+import { calculateProduct, comparisonGroup, rankProducts, formatCurrency, formatNumber } from "./calculator.js";
 
 const ITEM_STORAGE_KEY = "etiqueta-esperta-items-v1";
 const HISTORY_STORAGE_KEY = "etiqueta-esperta-history-v1";
@@ -209,7 +209,9 @@ function render() {
     return;
   }
 
-  const leader = ranked[0];
+  // Show the best buy among products comparable with the latest one.
+  const latestGroup = comparisonGroup(items[items.length - 1]);
+  const leader = ranked.find((item) => item.isLeader && item.group === latestGroup) || ranked[0];
   leaderboard.className = "leaderboard";
   leaderboard.innerHTML = `
     <p class="leaderboard-kicker">melhor custo por medida</p>
