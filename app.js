@@ -1,4 +1,4 @@
-import { calculateProduct, comparisonGroup, rankProducts, formatCurrency, formatNumber } from "./calculator.js";
+import { calculateProduct, comparisonGroup, rankProducts, restoreProducts, formatCurrency, formatNumber } from "./calculator.js";
 
 const ITEM_STORAGE_KEY = "etiqueta-esperta-items-v1";
 const HISTORY_STORAGE_KEY = "etiqueta-esperta-history-v1";
@@ -251,14 +251,7 @@ function persistItems() {
 }
 
 function loadItems() {
-  const saved = window.localStorage.getItem(ITEM_STORAGE_KEY);
-  if (!saved) return [];
-
-  try {
-    return JSON.parse(saved).map((item) => calculateProduct(item));
-  } catch {
-    return [];
-  }
+  return restoreProducts(window.localStorage.getItem(ITEM_STORAGE_KEY));
 }
 
 function persistHistory() {

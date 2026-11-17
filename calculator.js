@@ -39,6 +39,29 @@ export function calculateProduct(input) {
   };
 }
 
+/**
+ * Rebuild saved products, keeping every valid one. A single damaged entry
+ * used to make the whole saved list unreadable, and the next save then
+ * overwrote it with an empty list.
+ */
+export function restoreProducts(saved) {
+  if (!saved) return [];
+  let parsed;
+  try {
+    parsed = JSON.parse(saved);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+  return parsed.flatMap((item) => {
+    try {
+      return [calculateProduct(item)];
+    } catch {
+      return [];
+    }
+  });
+}
+
 /** Products are only comparable when they share a measure and a currency. */
 export function comparisonGroup(product) {
   return `${String(product.currency || "BRL").toUpperCase()}|${String(product.measureLabel || "").trim().toLowerCase()}`;
